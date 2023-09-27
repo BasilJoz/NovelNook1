@@ -1,0 +1,92 @@
+{% extends 'baseuser.html' %}
+{% block title %}Single Userpage{% endblock title %}
+{% block body %}
+{% load static %}
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-2 d-none d-md-block"></div>
+        <div class="col-lg-5 col-md-12" style="margin-top: 80px;">
+            <div id="variantImage" class="product-image" style="background-image: url('{{ products.image.url }}');"></div>
+        </div>
+        <div class="col-lg-5 col-md-12 d-flex justify-content-center" style="margin-top: 80px;">
+            <div class="product-details">
+                <h5 class="brand">{{products.author}}</h5>
+                <h5 class="product-title">{{ products.title }}</h5>
+                <h6 class="product-price">{{ products.price }}</h6>
+                <div class="mt-5">
+                    <a href="{% url 'add_cart' products.id %}"><button type="button" class="btn add-to-cart">ADD TO CART</button></a>
+                </div>
+                <div class="mt-3">
+                    <button type="button" class="btn save-to-wishlist">SAVE TO WISHLIST</button>
+                </div>
+                <div class="mt-5">
+                    <div class="card text-start mt-5 mb-5 product-description-card">
+                        <div class="card-header">
+                            <ul class="nav nav-tabs card-header-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active product-description-tab" href="#">PRODUCT DESCRIPTION</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body overflow-auto">
+                            <p class="card-text product-description">{{ products.discription }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>/* Add this CSS to your project's stylesheet */
+    .product-image {
+        background-size: cover;
+        background-position: center center;
+        height: 450px;
+        border: 1px solid rgb(237, 237, 237);
+    }
+    
+    .product-details {
+        text-align: center;
+    }
+    
+    .brand {
+        color: rgb(224, 184, 132);
+        font-weight: 400;
+    }
+    
+    .product-title {
+        color: dimgray;
+        font-weight: 400;
+    }
+    
+    .product-price {
+        color: dimgray;
+        font-weight: 400;
+    }
+    
+    .add-to-cart {
+        background-color: rgb(231, 152, 50);
+        width: 270px;
+        color: azure;
+    }
+    
+    .save-to-wishlist {
+        background-color: rgb(255, 255, 255);
+        width: 270px;
+        color: rgb(231, 152, 50);
+        border: 1px solid rgb(231, 152, 50);
+    }
+    
+    .product-description-card {
+        width: 270px;
+    }
+    
+    .product-description-tab {
+        color: dimgray;
+    }
+    
+    .product-description {
+        font-size: 13px;
+    }
+    </style>
+{% endblock body %}

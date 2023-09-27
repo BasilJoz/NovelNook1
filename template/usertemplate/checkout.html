@@ -1,0 +1,114 @@
+{% extends 'baseuser.html' %}
+
+
+{% block title %}checkout{% endblock %}
+
+{% load static %}
+{% block body %}
+<div style="margin-top: 90px;">
+	<form method="post" action="{% url 'checkout' %}">
+		{% csrf_token %}
+		<div class="container mt-5">
+			<h3 class="mb-4" style="font-weight: bold; font-family: 'Helvetica Neue', sans-serif;">SELECT ADDRESS</h3>
+			<div class="row">
+				<div class="col">
+
+					<table class="table table-bordered table-hover">
+						<thead class="thead-dark">
+							<tr>
+								<th class="text-center">SELECT</th>
+								<th class="text-center">ID</th>
+								<th class="text-center">ADDRESS DETAILS</th>
+								<th class="text-center">ACTIONS</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for address in addresses %}
+							<tr>
+								<td>
+									<div class="form-check text-center">
+										<input type="radio" class="form-check-input" name="selected_address"
+											value="{{ address.id }}">
+									</div>
+								</td>
+								<td class="text-center">{{ address.id }}</td>
+								<td>
+									<p class="text-center"><strong>{{ address.name }}</strong></p>
+									<p class="text-center">{{ address.postoffice }}, {{ address.street }},
+										{{address.city}},{{ address.state }}, {{ address.country }},
+										{{address.pin_code}}</p>
+								</td>
+								<td class="text-center">
+									<div class="btn-group">
+										<a href="{% url 'edit_address' address.id %}?next={% url 'checkout' %}"
+											class="btn btn-sm btn-primary mr-1">Edit</a>
+										<a href=""
+											class="btn btn-sm btn-danger">Delete</a>
+									</div>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="row mt-4">
+				<div class="col text-center">
+					<a href="{% url 'add_address' %}?next={% url 'checkout' %}" class="btn btn-primary">
+						<h4>ADD ADDRESS</h4>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class="container" style="margin-top: 20px;">
+			<div class="row justify-content-center"> <!-- Center the entire row -->
+				<div class="col-lg-6">
+					<div class="cart_details text-center mx-auto"> <!-- Center-align the content within the column -->
+						<div class="checkout_title" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">
+							Cart Total
+						</div>
+						<div class="cart_total">
+							<ul class="list-group mt-3">
+								<li class="list-group-item d-flex justify-content-between align-items-center">
+									<span class="cart_total_title" style="font-weight: bold;">SUBTOTAL</span>
+									<span class="cart_total_price">{{total_price}}</span>
+								</li>
+								<li class="list-group-item d-flex justify-content-between align-items-center">
+									<span class="cart_total_title" style="font-weight: bold;">SHIPPING</span>
+									<span class="cart_total_price">₹ 50</span>
+								</li>
+								<li class="list-group-item d-flex justify-content-between align-items-center total_row">
+									<span class="cart_total_title"
+										style="font-size: 18px; font-weight: bold;">TOTAL</span>
+									<span class="cart_total_price" style="font-size: 18px; font-weight: bold;">₹
+										{{final_total }}</span>
+								</li>
+							</ul>
+						</div>
+						<div class="payment_options mt-3">
+							<div class="form-check">
+								<input type="radio" id="radio_payment_1" name="payment_radio" class="form-check-input">
+								<label for="radio_payment_1" class="form-check-label" style="font-weight: bold;">Cash on
+									Delivery</label>
+							</div>
+							<div class="form-check">
+								<input type="radio" id="radio_payment_2" name="payment_radio" class="form-check-input"
+									checked>
+								<label for="radio_payment_2" class="form-check-label"
+									style="font-weight: bold;">PayPal</label>
+							</div>
+							<div class="payment_option mt-2">
+								<a href="#"><img src="{% static 'images/visa.jpg' %}" alt="Visa"
+										style="margin-right: 10px;"></a>
+								<a href="#"><img src="{% static 'images/master.jpg' %}" alt="MasterCard"></a>
+							</div>
+							<button type="submit" class="cart_total_button btn btn-primary mt-3 mb-5"
+								style="padding: 5px 15px; font-weight: bold;">Place Order</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+{% endblock %}

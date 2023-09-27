@@ -1,0 +1,17 @@
+{% extends 'baseadmin.html' %}
+{% block title %}Edit Catergory{% endblock title %}
+{% block body %}
+<div class="container mt-4" style="position: relative; top: 50px; padding: 50px;">
+    <h3 class="mb-4">Edit Category</h3>
+    <form method="post" action="{% url 'edit_category' cat.id %}">
+        {% csrf_token %}
+        <div class="form-group" style="width: 30%;">
+            <label for="name">Edit Category Name</label>
+            <input type="text" class="form-control" id="name" name="edited_name" value={{cat.name}} required>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Edit Category</button></a>
+    </form>
+</div>
+
+{% endblock body %}

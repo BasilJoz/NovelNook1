@@ -1,0 +1,78 @@
+{% extends 'baseadmin.html' %}
+{% block title %}Add Products{% endblock title %}
+{% block body %}
+<div class="container mt-3" style="position: relative; width: 850px; padding: 30px;">
+    <h3 class="mb-4 mt-5">Add Product</h3>
+    <form method="post" action="{% url 'add_products' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group d-inline-flex" style="width: 70%;">
+            <div>
+                <label for="name">Title</label>
+                <input type="text" class="form-control" id="name" name="book_title" style="width: 300px;" required>
+            </div>
+            <div style="margin-left: 100px;">
+                <label for="categories">Categories</label>
+                <select class="form-control" id="categories" name="book_categories" style="width: 300px;" required>
+                    <option value="">Select a Category</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.name}}">{{ cat.name}}</option>
+                    {%endfor%}
+                </select>
+            </div>
+        </div>
+        <div class="form-group d-inline-flex" style="width: 70%;">
+            <div>
+                <label for="name">Author</label>
+                <input type="text" class="form-control" id="size" name="book_author" style="width: 300px;" required>
+            </div>
+            <div style="margin-left: 100px;">
+                <label for="status">Status</label>
+                <select class="form-control" id="status" name="book_active" style="width: 300px;" required>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group d-inline-flex" style="width: 70%;">
+            <div>
+                <label for="name">Price</label>
+                <input type="text" class="form-control" id="price" name="book_price" style="width: 300px;" required>
+            </div>
+            <div style="margin-left: 100px;">
+                <label for="category">Offer Price</label>
+                <input type="text" class="form-control" id="offer_price" name="book_offer_price" style="width: 300px;">
+            </div>
+        </div>
+        <div class="form-group d-inline-flex" style="width: 70%;">
+            <div>
+                <label for="name">Quantity</label>
+                <input type="text" class="form-control" id="quantity" name="book_quantity" style="width: 300px;" required>
+            </div>
+            <div style="margin-left: 100px;">
+                <label for="category">Discount (%)</label>
+                <input type="text" class="form-control" id="discount" name="book_discount" style="width: 300px;">
+            </div>
+            
+        </div>
+      
+
+        <div class="form-group d-inline-flex" style="width: 70%;">
+            <div>
+                <label for="category">Product discription</label>
+                <textarea class="form-control" id="description" name="prod_description" rows="4" style="width: 300px;" required></textarea>
+            </div>
+           
+            <div style="position: relative;left:100px">
+                <label for="image" class="col-md-2 col-form-label">Image</label>
+                <div class="col-md-4">
+                    <input type="file" id="image" name="book_image" accept="image/*" required>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4" style="margin-left:300px ;">
+            <a href="{% url 'add_products' %}"><button type="submit" class="btn btn-primary">Add Product</button></a>
+        </div>
+    </form>
+    
+</div>
+{% endblock body %}

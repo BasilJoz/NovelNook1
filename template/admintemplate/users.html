@@ -1,0 +1,40 @@
+{% extends 'baseadmin.html' %}
+{% block title %}Admin UserDetails{% endblock title %}
+{% block body %}
+<div class="d-flex jusify-content-center mt-5">
+    <h2 style="position:relative;left: 400px;">User Details</h2>
+</div>
+
+<div class="col-sm-12 col-xl-6 " style='position: relative;left: 50px; width: 800px;'>
+    <div class="bg-light rounded h-100 p-4">
+        <!-- <h6 class="mb-4">Table Without Border</h6> -->
+        <table class="table table-borderless">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">User Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone No</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in adm_user %}
+                <tr>
+                    <th scope="row">{{user.id}}</th>
+                    <td>{{user.username}}</td>
+                    <td>{{user.email}}</td>
+                    <td>{{user.phone_number}}</td>
+                    <td>
+                        {% if user.is_active %}
+                        <a href="block_user/{{user.id}}" class="btn btn-danger btn-sm">Block</a>
+                        {% else %}
+                        <a href="unblock_user/{{user.id}}" class="btn btn-primary btn-sm">Unblock</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endblock body %}

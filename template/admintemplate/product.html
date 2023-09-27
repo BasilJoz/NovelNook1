@@ -1,0 +1,60 @@
+{% extends 'baseadmin.html' %}
+{% block title %}product{% endblock title %}
+{% block body %}
+<div class="container ms-4 " style="position: relative; top: 50px;right: 60px; padding: 50px;">
+    <h3 class="mb-4">Admin Product Page</h3>
+
+    <!-- Product List -->
+    <div class="card mb-4 " style="width: 950px; ">
+        <div class="card-header">
+            <h5>Product List</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                       
+                        <th>Title</th>
+                        <th>Book cover</th>
+                        <th>Author</th>
+                        <th>Categories</th>
+                        <th>Price</th>
+                        <th>Offer Price</th>
+                        <th>Quantity</th>
+                        <th>Discount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for books in books_items %}
+                    <tr>
+                        <td>{{ books.title }}</td>
+                        <td><img src="#" alt="{{ books.name }}" style="width: 100px;"></td>
+                        <td>{{ books.author }}</td>
+                        <td>{{ books.categories }}</td>
+                        <td>₹{{ books.price }}</td>
+                        <td>₹{{ books.offer_price }}</td>
+                        <td>{{ books.quantity }}</td>
+                        <td>{{ books.discount_percent }}%</td>
+                        <td>{{ books.active }}</td>
+                        <td>
+                            <a href="{% url 'edit_products' books.id %}" class="btn btn-primary btn-sm">Edit</a>
+                            {% if books.deleted == True%}
+                            <a href="{% url 'undelete_products' books.id %}" class="btn btn-success btn-sm">Undo</a>
+                            {% else %}
+                            <a href="{% url 'delete_products' books.id %}" class="btn btn-danger btn-sm">Soft Delete</a>
+                            {% endif%}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href='add_products' class="btn btn-primary" style="width: 170px;">Add Product</a>
+    </div>
+</div>
+{% endblock body %}

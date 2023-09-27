@@ -1,0 +1,66 @@
+{% extends 'baseuser.html' %}
+
+{% block body %}
+<div class="container" style="padding-top: 120px;">
+    <div class="card">
+        <div class="card-body">
+            <form action="{% url 'edit_address' address.id %}" method="post">
+                {% csrf_token %}
+                <div class="form-row text-center mb-4">
+                    <div class="col">
+                        <h2>Edit Address</h2>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                        <label for="Edited_Housename_companyname">House Name or Company Name:</label>
+                        <input type="text" class="form-control" id="Edited_Housename_companyname"
+                            name="Edited_Housename_companyname" value="{{address.name}}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="Edited_Post_office">Post Office:</label>
+                        <input type="text" class="form-control" id="Edited_Post_office" name="Edited_Post_office"
+                            value="{{address.postoffice}}" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                        <label for="Edited_Street">Street:</label>
+                        <input type="text" class="form-control" id="Edited_Street" name="Edited_Street"
+                            value="{{address.street}}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="Edited_City">City:</label>
+                        <input type="text" class="form-control" id="Edited_City" name="Edited_City"
+                            value="{{address.city}}" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                        <label for="Edited_State">State:</label>
+                        <input type="text" class="form-control" id="Edited_State" name="Edited_State"
+                            value="{{address.state}}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="Edited_Country">Country:</label>
+                        <input type="text" class="form-control" id="Edited_Country" name="Edited_Country"
+                            value="{{address.country}}" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                        <label for="Edited_Pin_code">Pin Code:</label>
+                        <input type="text" class="form-control" id="Edited_Pin_code" name="Edited_Pin_code"
+                            value="{{address.pin_code}}" required>
+                    </div>
+                </div>
+                <div class="form-row text-center">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">SAVE EDITS</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

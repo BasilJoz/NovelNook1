@@ -1,0 +1,356 @@
+{% extends 'baseuser.html' %}
+{% block title %}Cart{% endblock title %}
+{% block body %}
+{% load static %}
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Shopping Cart</h4>
+                    <div class="breadcrumb__links">
+                        <a href="./index.html">Home</a>
+                        <a href="./shop.html">Shop</a>
+                        <span>Shopping Cart</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<!-- Shopping Cart Section Begin -->
+<section class="shopping-cart spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="shopping__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        {% for item in cart_items %}
+                        <tbody>
+                           
+                            <tr>
+                                <td class="product__cart__item">
+                                    <div class="product__cart__item__pic">
+                                        <img src="{{item.book.image.url}}" alt="" class="img-fluid" style="max-width: 100px; max-height: 100px;">
+                                    </div>
+                                    <div class="product__cart__item__text">
+                                        <h6>{{item.book.title}}</h6>
+                                        <h5>{{item.book.price}}</h5>
+                                    </div>
+                                </td>
+                                <td class="quantity__item">
+                                    <div class="quantity">
+                                        <div class="d-flex align-items-baseline">
+                                                <button class="btn btn-dark decrement-btn" onclick="updateQuantity('{{ item.id }}', '-1')" style="margin-right: 10px;">-</button>
+                                            <p class="product-quantity" id="quantity{{item.id}}">{{ item.quantity }}</p>
+                                            <button class="btn btn-dark increment-btn" onclick="updateQuantity('{{ item.id }}', '1')" style="margin-left: 10px;">+</button>
+                                        </div>
+                                        
+                                        <!-- <div class="pro-qty-2">
+                                            <input type="number" class="quantity-input" data-item-id="{{ item.id }}" value="{{ item.quantity }}" min="1">
+                                        </div> -->
+                                    </div>
+                                </td>
+                                
+                                
+                                
+                                <td class="cart__price" id="product_price{{item.id}}">{% widthratio item.book.price 1 item.quantity %}</td>
+                                <td class="cart__close">
+                                    <a href="#" data-toggle="modal" data-target="#deleteCartItemModal" data-item-id="{{ item.id }}">
+                                        <i class="fa fa-close"></i>
+                                    </a>
+                                </td>
+                                
+                            </tr>
+                            
+                           
+                           
+                        </tbody>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="continue__btn">
+                            <a href="{% url 'handleshop' %}">Continue Shopping</a>
+                        </div>
+                    </div>
+                    <!-- <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="continue__btn update__btn">
+                            <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cart_coupon" style="margin-top: 40px;">
+                    <div class="cart_title">Coupon Code</div>
+                    {% if coupon_discount > 0 %}
+                    <!-- Display the applied coupon if one exists -->
+                    <div class="applied_coupon"
+                        style="background-color: #f9f9f9; padding: 10px; border-radius: 5px; margin-top: 20px;">
+                        <p><strong>Applied Coupon:</strong> <span style="font-weight: bold; color: #3498db;">{{cart_coupon.coupon_code }}</span></p>
+                        <p><strong>Coupon Discount:</strong> <span style="font-weight: bold; color: #2ecc71;">{{coupon_discount }}</span></p>
+                        <!-- Add a delete button -->
+                        <form action="{% url 'remove_coupon' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="coupon_id" value="{{ cart_coupon.pk }}">
+                            <button type="submit" class="btn btn-danger">Remove Coupon</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <!-- Display the regular coupon input form if no coupon is applied -->
+                    <form action="{% url 'cart' %}" method="POST"
+                        class="cart_coupon_form d-flex flex-row align-items-start justify-content-start"
+                        id="cart_coupon_form">
+                        {% csrf_token %}
+                        <input type="text" class="cart_coupon_input form-control" placeholder="Coupon code"
+                            name="coupon_code" required="required" />
+                        <button type="submit" class="button_clear cart_button_2 btn btn-dark">Apply</button>
+                    </form>
+                    {% endif %}
+                </div>
+                <a href="{% url 'coupons_details' %}">
+                    <p>coupons.</p>
+                </a>
+                <div class="cart__total">
+                    <h6>Cart total</h6>
+                    <ul>
+                        <li>Subtotal <span class="sub_total">{{total_price}}</span></li>
+                        <li>Total <span class="total">{{total_price}}</span></li>
+                    </ul>
+                    <a href="{% url 'checkout' %}?cart_items=true" class="primary-btn">Proceed to checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Delete Cart Item Modal -->
+<div class="modal fade" id="deleteCartItemModal" tabindex="-1" role="dialog" aria-labelledby="deleteCartItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCartItemModalLabel">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this item from your cart?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="deleteCartItemBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</section>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+
+<script>
+
+        const hello = (arg)=>{
+            $.ajax({
+                type:'POST',
+                url:'/userside/hello',
+                data:{
+                    'item':arg,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success:(response)=>{
+                    console.log(response)
+                }
+            })
+        }
+
+        const updateQuantity = (itemId, quantity)=>{
+            console.log('helloo',itemId,quantity)
+            // Use AJAX to update the cart item quantity
+            $.ajax({
+                type: 'POST',
+                url: '/userside/update_cart_item_quantity',
+                data: {
+                    'item_id': itemId,
+                    'quantity':quantity,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    console.log('AJAX Success:', response);
+                    if(!response.success){
+                        alert(response.message)
+                    }else{
+                        $('#quantity' + itemId).text(response.quantity);
+                        $('#product_price' + itemId).text(response.product_price * response.quantity);
+                        $('.sub_total').text(response.total_price)
+                        $('.total').text(response.total_price)
+                    }
+                    // Handle success (if needed)
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log('AJAX Error:', errmsg);
+                    // Handle errors (if needed)
+                }
+            });
+        }
+
+    /* $(document).ready(function() {
+        // Attach click event handlers to the buttons
+        $(".decrement-btn").click(decrementQuantity);
+        $(".increment-btn").click(incrementQuantity);
+    }); 
+    
+    function incrementQuantity() {
+        var itemId = $(this).data('item-id');
+        var quantity = 1
+
+    
+        // Use AJAX to update the cart item quantity
+        $.ajax({
+            type: 'POST',
+            url: '/userside/update_cart_item_quantity/' + itemId + '/',
+            data: {
+                'item_id': itemId,
+                'quantity':quantity,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                console.log('AJAX Success:', response);
+                $('#product-quantity').text(response.quantity)
+                $('.cart__price').text(response.total_price)
+                // Handle success (if needed)
+            },
+            error: function(xhr, errmsg, err) {
+                console.log('AJAX Error:', errmsg);
+                // Handle errors (if needed)
+            }
+        });
+    }
+
+    function decrementQuantity() {
+        var itemId = $(this).data('item-id');
+        var quantity = -1
+
+    
+        // Use AJAX to update the cart item quantity
+        $.ajax({
+            type: 'POST',
+            url: '/userside/update_cart_item_quantity/' + itemId + '/',
+            data: {
+                'item_id': itemId,
+                'quantity':quantity,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                console.log('AJAX Success:', response);
+                $('#product-quantity').text(response.quantity)
+                $('.cart__price').text(response.total_price)
+                // Handle success (if needed)
+            },
+            error: function(xhr, errmsg, err) {
+                console.log('AJAX Error:', errmsg);
+                // Handle errors (if needed)
+            }
+        });
+    } */
+    
+
+    /* $(document).ready(function () {
+        // Listen to changes in quantity inputs
+        $('.quantity-input').on('change', function () {
+            var newQuantity = $(this).val();
+            var itemId = $(this).data('item-id');
+
+            console.log('New Quantity:', newQuantity);
+            console.log('Item ID:', itemId);
+
+            // Use AJAX to update the cart item quantity
+            $.ajax({
+                type: 'POST',
+                url: '/update_cart_item_quantity/' + itemId + '/',
+
+                data: {
+                    'item_id': itemId,
+                    'new_quantity': newQuantity,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    console.log('AJAX Success:', response);
+                    // Handle success (if needed)
+                },
+                error: function (xhr, errmsg, err) {
+                    console.log('AJAX Error:', errmsg);
+                    // Handle errors (if needed)
+                }
+            });
+        });
+    }); */
+</script>
+
+
+<script>
+
+    $(document).ready(function () {
+        var deleteCartItemModal = $('#deleteCartItemModal');
+        var deleteCartItemBtn = $('#deleteCartItemBtn');
+        var itemToDeleteId = null;
+
+        // When a "Delete" link is clicked
+        $('.cart__close a').click(function () {
+            itemToDeleteId = $(this).data('item-id');
+            deleteCartItemModal.modal('show'); // Show the modal
+        });
+
+        // When the "Delete" button in the modal is clicked
+        deleteCartItemBtn.click(function () {
+            if (itemToDeleteId !== null) {
+                // Construct the URL dynamically
+                var deleteUrl = '/userside/delete_cart_item/' + itemToDeleteId + '/';
+
+                // Use AJAX to delete the cart item
+                $.ajax({
+                    type: 'POST',
+                    url: deleteUrl,
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function (response) {
+                        console.log('AJAX Success:', response);
+                        // Handle success (if needed)
+
+                        // Close the modal
+                        // deleteCartItemModal.modal('hide')
+                        location.reload()
+                    },
+                    error: function (xhr, errmsg, err) {
+                        console.log('AJAX Error:', errmsg);
+                        // Handle errors (if needed)
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+
+
+
+{% endblock body %}

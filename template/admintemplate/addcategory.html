@@ -1,0 +1,16 @@
+{% extends 'baseadmin.html' %}
+{% block title %}Catergory{% endblock title %}
+{% block body %}
+<div class="container mt-4" style="position: relative; top: 50px; padding: 50px;">
+    <h3 class="mb-4">Add Category</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group" style="width: 30%;">
+            <label for="name">Category Name</label>
+            <input type="text" class="form-control" id="name" name="category_name" required>
+            <br>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Category</button>
+    </form>
+</div>
+{% endblock body %}

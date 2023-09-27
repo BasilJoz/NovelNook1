@@ -1,0 +1,68 @@
+{% extends 'baseuser.html' %}
+{% block title %}Add address{% endblock title %}
+{% block body %}
+<div style="margin-top: 85px;">
+    <div class="container my-5">
+        <div class="card">
+            <div class="card-body">
+                <form action="{% url 'add_address' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-row text-center mb-4">
+                        <div class="col">
+                            <h2>Add Address</h2>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-6 mb-3">
+                            <label for="Housename_companyname">House Name or Company Name:</label>
+                            <input type="text" class="form-control" id="Housename_companyname"
+                                name="Housename_companyname" placeholder="Housename or Company Name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="inputPostOffice">Post Office:</label>
+                            <input type="text" class="form-control" id="inputPostOffice" name="Post_office"
+                                placeholder="Post Office" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-6 mb-3">
+                            <label for="inputStreet">Street:</label>
+                            <input type="text" class="form-control" id="inputStreet" name="Street" placeholder="Street"
+                                required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="inputCity">City:</label>
+                            <input type="text" class="form-control" id="inputCity" name="City" placeholder="City"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-6 mb-3">
+                            <label for="inputState">State:</label>
+                            <input type="text" class="form-control" id="inputState" name="State" placeholder="State"
+                                required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="inputCountry">Country:</label>
+                            <input type="text" class="form-control" id="inputCountry" name="Country"
+                                placeholder="Country" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-6 mb-3">
+                            <label for="inputPinCode">Pin Code:</label>
+                            <input type="text" class="form-control" id="inputPinCode" name="Pin_code"
+                                placeholder="Pin Code" required>
+                        </div>
+                    </div>
+                    <div class="form-row text-center">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary ">Add Address</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

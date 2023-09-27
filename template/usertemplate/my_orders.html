@@ -1,0 +1,59 @@
+{% extends 'baseuser.html' %}
+{% block title %}My Order{% endblock title %}
+{% load static %}
+
+{% block body %}
+<div style="margin: 80px 0;">
+    <div style="text-align: center;">
+        <h3 style="color: #333; font-weight: bold; font-family: Arial, sans-serif;">MY ORDERS</h3>
+    </div>
+    <div class="container" style=" border: 1px solid #ddd; padding: 30px; border-radius: 10px;">
+        {% if order_items %}
+        {% for item in order_items %}
+        <div class="order-item"
+            style="border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; background-color: #f9f9f9; border-radius: 8px;">
+            <div class="row">
+                <div class="col-lg-2">
+                    <img src="{{ item.product.image.url }}" style="height: 80px; width: 125px; border-radius: 6px;"
+                        alt="" class="order-item-image">
+                </div>
+                <div class="col-lg-2">
+                    <div class="order-item-title" style="color: #333; margin-top: 17px; font-weight: bold;">Product:<br>
+                        {{ item.product }}</div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="order-item-status" style="color: #333; margin-top: 17px; font-weight: bold;">Order
+                        Status:<br>
+                        {{item.order_status }}</div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="order-item-date" style="color: #333; font-weight: bold;">Ordered Date:<br>
+                        {{item.order.order_date }}
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="order-item-date" style="color: #333; margin-top: 25px; font-weight: bold;">Quantity:
+                        {{item.quantity }}
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div style="margin-top: 20px;">
+                        {% if item.order_status == 'Order Placed' or item.order_status == 'Shipped' %}
+                        <form method="post" action="{% url 'cancel_order' item.order.id item.product.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-dark btn-cancel">CANCEL</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="font-size: 18px; color: #333; font-weight: bold;">No Active Orders</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
