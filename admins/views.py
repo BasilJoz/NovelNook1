@@ -42,7 +42,7 @@ def hanglesignin(request):
        return render(request,"admintemplate/signin.html")
     else:
     
-        return render(request,"admintemplate/index.html")
+        return render(request,"admintemplate/signin.html")
     
     
 @never_cache

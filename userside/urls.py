@@ -17,7 +17,9 @@ urlpatterns = [
     path('get_cart_item_count', views.get_cart_item_count, name='get_cart_item_count'),
     path('coupons_details', views.coupons_details, name='coupons_details'),
     path('remove_coupon', views.remove_coupon, name='remove_coupon'),
-    path('hello', views.hello, name='hello')
+    path('hello', views.hello, name='hello'),
+    path('payment/<int:address_id>', views.payment, name='payment'),
+    path('razor/<int:address_id>/<str:final_total>', views.razor, name="razor"),
 
     
 ]

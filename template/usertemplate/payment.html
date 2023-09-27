@@ -1,0 +1,199 @@
+{% extends 'baseuser.html' %}
+
+{% load static %}
+
+{% block body %}
+<style>
+    /* Body styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+    }
+
+    /* Cart Details styles */
+    .cart_details {
+        text-align: center;
+    }
+
+    /* Checkout title styles */
+    .checkout_title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    /* Cart Total styles */
+    .cart_total_title {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .cart_total_price {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .total_row {
+        font-size: 16px;
+        color: #333;
+    }
+
+    /* Payment Options styles */
+    .payment_options {
+        margin-top: 2rem;
+    }
+
+    .form-check-label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .payment_option img {
+        margin-right: 10px;
+    }
+
+    /* Place Order button styles */
+    .cart_total_button {
+        margin-top: 3rem;
+        font-weight: bold;
+        background-color: #4caf50;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .cart_total_button:hover {
+        background-color: #45a049;
+    }
+
+    /* Proceed to Checkout button styles */
+    .proceed-to-checkout-link {
+        text-align: center;
+        display: block;
+        margin-top: 2rem;
+    }
+
+    .proceed-to-checkout-button {
+        font-weight: bold;
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .proceed-to-checkout-button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .col-lg-6 {
+            max-width: 100%;
+        }
+    }
+</style>
+<div class="container" style="margin-top: 100px;">
+    <div class="row justify-content-center"> <!-- Center the entire row -->
+        <div class="col-lg-6">
+            <div class="cart_details text-center mx-auto"> <!-- Center-align the content within the column -->
+                <form action="{% url 'payment' address_id %}" method="post">
+                    {% csrf_token %}
+                    <div class="checkout_title" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">
+                        PAYMENT
+                    </div>
+                    <div class="cart_total">
+                        <ul class="list-group mt-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="cart_total_title" style="font-weight: bold;">SUBTOTAL</span>
+                                <span class="cart_total_price">{{total_price}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="cart_total_title" style="font-weight: bold;">SHIPPING</span>
+                                <span class="cart_total_price">₹ 50</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center total_row">
+                                <span class="cart_total_title" style="font-size: 16px; font-weight: bold;">Final Total
+                                    (Including Shipping Charges)</span>
+                                <span class="cart_total_price"
+                                    style="font-size: 18px; font-weight: bold;">₹{{final_total}}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="payment_options mt-3">
+                        <div class="form-check">
+                            <input type="radio" id="radio_payment_1" name="cash_on_delivery" class="form-check-input">
+                            <label for="radio_payment_1" class="form-check-label" style="font-weight: bold;">CASH ON
+                                DELIVERY</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" id="rzp-button1" name="razorpay" class="form-check-input" checked>
+                            <label for="radio_payment_2" class="form-check-label"
+                                style="font-weight: bold;">RAZORPAY</label>
+                        </div>
+                        <button type="submit" class="cart_total_button btn btn-primary mt-3">Place Order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    // JavaScript to handle radio button behavior
+    const cashOnDeliveryRadio = document.getElementById('radio_payment_1');
+    const razorpayRadio = document.getElementById('rzp-button1');
+
+    cashOnDeliveryRadio.addEventListener('change', function () {
+        if (cashOnDeliveryRadio.checked) {
+            razorpayRadio.checked = false;
+        }
+    });
+
+    razorpayRadio.addEventListener('change', function () {
+        if (razorpayRadio.checked) {
+            cashOnDeliveryRadio.checked = false;
+        }
+    });
+
+
+    // Your existing Razorpay code here
+    var address_id = "{{ address_id }}";
+    console.log("Address ID:", address_id);
+    var final_total = "{{ final_total }}";
+    var options = {
+        key: "rzp_test_lUDednPmzOZGDp",
+        amount: Number("{{final_total}}") * 100,
+        currency: "INR",
+        name: "bb books",
+        description: "Thanks",
+        order_id: "{{payment.id}}",
+        handler: function (response) {
+            window.location.href = `http://127.0.0.1:8000/userside/razor/${address_id}/${final_total}`;
+        },
+        theme: {
+            color: "#3399cc",
+        },
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.on("payment.success", function (response) {
+        // Submit the form after successful payment
+        document.getElementById("payment-form").submit();
+    });
+    rzp1.on("payment.failed", function (response) {
+        // Handle failed payment here
+        alert("Payment failed");
+    });
+    document.getElementById("rzp-button1").onclick = function (e) {
+        rzp1.open();
+        e.preventDefault();
+    };
+</script>
+{% endblock %}

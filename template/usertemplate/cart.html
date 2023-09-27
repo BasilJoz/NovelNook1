@@ -94,7 +94,13 @@
             </div>
             <div class="col-lg-4">
                 <div class="cart_coupon" style="margin-top: 40px;">
-                    <div class="cart_title">Coupon Code</div>
+                    <div class="cart_title m-1">Coupon Code</div>
+                    {% for message in messages %}
+                <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                    <strong></strong> {{message}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                {% endfor %}
                     {% if coupon_discount > 0 %}
                     <!-- Display the applied coupon if one exists -->
                     <div class="applied_coupon"
@@ -121,15 +127,19 @@
                     {% endif %}
                 </div>
                 <a href="{% url 'coupons_details' %}">
-                    <p>coupons.</p>
+                    <p> Avaible coupons.</p>
                 </a>
                 <div class="cart__total">
                     <h6>Cart total</h6>
                     <ul>
                         <li>Subtotal <span class="sub_total">{{total_price}}</span></li>
-                        <li>Total <span class="total">{{total_price}}</span></li>
+                        {% if coupon_discount %}
+                        <li>coupon_discount <span class="total">{{coupon_discount}}</span></li>
+                        <li>Total <span class="total">{{final_total}}</span></li>
+                        {% endif %}
+                       
                     </ul>
-                    <a href="{% url 'checkout' %}?cart_items=true" class="primary-btn">Proceed to checkout</a>
+                    <a href="{% url 'checkout' %}" class="primary-btn">Proceed to checkout</a>
                 </div>
             </div>
         </div>
