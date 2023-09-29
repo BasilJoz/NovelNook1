@@ -20,6 +20,7 @@ def cart(request):
     cart, created = Cart.objects.get_or_create(user=user)
     cart_item = CartItems.objects.filter(cart=cart)
     total_price = sum(item.quantity * item.book.price for item in cart_item)
+    print(total_price,'total!!!')
     cart_coupon = cart.coupon
     if request.method == "POST":
         coupon_code = request.POST.get("coupon_code")
@@ -41,6 +42,8 @@ def cart(request):
 
     coupon_discount = cart_coupon.discount if cart_coupon else 0
     final_total = total_price - coupon_discount
+    print(final_total,'price2')
+    print(cart_item)
     return render(
         request,
         "usertemplate/cart.html",
@@ -87,6 +90,7 @@ def update_cart_item_quantity(request):
             total_price = sum(
                 item.quantity * item.book.price for item in cart_item_list
             )
+            print(total_price,'khskfdhkhkshkh')
             updated_quantity = cart_item.quantity
             product_price = cart_item.book.price
 
@@ -106,14 +110,21 @@ def update_cart_item_quantity(request):
 
 @login_required(login_url="login")
 def add_cart(request, book_id):
+    
     user = request.user
     cart, created = Cart.objects.get_or_create(user=user)
+    
     book = get_object_or_404(books, id=book_id)
-    cart_items, item_created = CartItems.objects.get_or_create(
+    if book.quantity>0:
+        
+        cart_items, item_created = CartItems.objects.get_or_create(
         cart=cart, book=book, defaults={"quantity": 1}
-    )
-    cart_items.save()
-    return redirect("hanldesingleproduct", product_id=book_id)
+        )
+        cart_items.save()
+        return redirect("hanldesingleproduct", product_id=book_id)
+    else:
+        messages.error(request,'Out Of Stock')
+        return redirect('hanldesingleproduct', product_id=book_id)
 
 
 def delete_cart_item(request, item_id):
@@ -307,6 +318,7 @@ def payment(request, address_id):
     cart_coupon = cart.coupon
     coupon_discount = cart_coupon.discount if cart_coupon else 0
     cart_items = CartItems.objects.filter(cart=cart)
+    print(cart_items,'cartstimess')
 
     total_price = 0
     final_total = 0
@@ -315,13 +327,15 @@ def payment(request, address_id):
         item.offer_price = item.book.price
         item.total_price_each = item.offer_price * item.quantity
         total_price += item.total_price_each
-
-        if cart_coupon:
+        print(total_price,final_total)
+    if cart_coupon:
             total_price = total_price - coupon_discount
-        else:
+            print(total_price,'total3')
+    else:
             pass
 
     final_total = total_price + 50
+    print(final_total,'final total4')
 
     if request.method == "GET":
         razorpay_client = razorpay.Client(
@@ -402,6 +416,7 @@ def razor(request, address_id, final_total):
         cart_coupon = cart.coupon
         coupon_discount = cart_coupon.discount if cart_coupon else 0
         cart_items = CartItems.objects.filter(cart=cart)
+        print(cart_items,'razeoyr')
 
         total_price = 0
 
@@ -424,7 +439,7 @@ def razor(request, address_id, final_total):
                 total_price=total_price,
                 total_price_shipping=final_total,
             )
-
+            a=None
             for item in cart_items:
                 book = item.book
                 quantity = item.quantity
@@ -433,11 +448,12 @@ def razor(request, address_id, final_total):
                     book.quantity -= quantity
                     book.save()
 
-                    OrderItem.objects.create(
+                    a=OrderItem.objects.create(
                         order=order,
                         product=book,
                         quantity=quantity,
                     )
+                    print(a)
                 else:
                     messages.error(request, "Insufficient stock for one or more items.")
                     
