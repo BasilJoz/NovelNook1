@@ -570,3 +570,6 @@ def hello(request):
     arg = request.POST["item"]
     print(arg)
     return JsonResponse({"success": True})
+
+def wishlist(request):
+    return render(request,'usertemplate/wishlist.html')

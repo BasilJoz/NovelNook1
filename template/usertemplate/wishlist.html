@@ -1,0 +1,47 @@
+{% extends 'baseuser.html' %}
+
+{% load static %}
+
+{% block title %}
+WISHLIST
+{% endblock %}
+
+{% block body %}
+
+<div class="col-lg-8 col-md-6 bg-white mt-5 pb-5" style="border: 0.3px solid rgb(255, 255, 255); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); height: 100%;">
+    <div class="col-lg-11 col-md-6 ms-4 mt-5 ps-3">
+        <div>
+            <h5 style="color: rgb(228, 158, 68);">MY WISHLIST</h5>
+        </div>
+        {% for item in wishlist %}
+        <div class="card mb-3 p-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <a href="#"><img src="#" alt="#" class="img-fluid"></a>
+                    </div>
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <h6 class="card-subtitle mb-2">{{ item.product_name }}</h6>
+                    </div>
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <p class="card-subtitle mb-2">{{ item.product_brand }} </p>
+                    </div>
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <p class="card-subtitle mb-2">Size : {{ item.variant_size }}</p>
+                    </div>
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <p class="card-subtitle mb-2">₹ {{ item.variant_price }}</p>
+                    </div>
+                    <div class="col-md-2 d-flex justify-content-end">
+                        <a href="#"><i class="bi bi-trash" style="cursor: pointer; color: black;"></i></a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+</div>
+
+{% endblock %}
