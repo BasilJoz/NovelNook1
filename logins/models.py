@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 import hashlib
+from decimal import Decimal
 
 # Create your models here.
 
@@ -32,6 +33,7 @@ class user_details(AbstractUser):
     user_permissions = models.ManyToManyField(
         Group, related_name="custom_user_permissions", blank=True
     )
+   
     
 class Address(models.Model):
     user = models.ForeignKey(user_details, on_delete=models.CASCADE)
@@ -45,3 +47,5 @@ class Address(models.Model):
 
     def _str_(self):
         return self.name
+
+

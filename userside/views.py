@@ -3,7 +3,7 @@ from .models import Cart, CartItems
 from admins.models import books, Coupon
 from logins.models import user_details
 from logins.models import Address
-from .models import Order, OrderItem
+from .models import Order, OrderItem,Wishlist
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages
@@ -571,5 +571,60 @@ def hello(request):
     print(arg)
     return JsonResponse({"success": True})
 
+
+from django.shortcuts import render, redirect
+from .models import Wishlist
+
 def wishlist(request):
-    return render(request,'usertemplate/wishlist.html')
+    if request.user.is_authenticated:
+        user_wishlist = Wishlist.objects.filter(user=request.user)
+        
+        # Create an empty list to store wishlist item details
+        wishlist_items = []
+        
+        for item in user_wishlist:
+            for book in item.books.all():
+                # Assuming that 'books' is a ManyToManyField related to your Wishlist model
+                book_info = {
+                    'title': book.title,
+                    'price': book.price,  # Replace with the actual price field name
+                    'image_url': book.image.url , # Replace with the actual image field name
+                    'id': book.id
+                }
+                wishlist_items.append(book_info)
+
+        return render(request, 'usertemplate/wishlist.html', {'wishlist_items': wishlist_items})
+    else:
+        # Handle the case where the user is not logged in
+        return redirect('login')
+
+
+def add_to_wishlist(request, book_id):
+    if request.user.is_authenticated:
+        book = get_object_or_404(books, pk=book_id)
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        wishlist.books.add(book)
+        return redirect('hanldesingleproduct', product_id=book_id)
+    else:
+        # Handle the case where the user is not logged in
+        return redirect('login')  # You can customize this redirection
+    
+
+def remove_from_wishlist(request, book_id):
+    user = request.user
+    product = get_object_or_404(books, id=book_id)
+    wishlist, created = Wishlist.objects.get_or_create(user=user)
+    
+    if product in wishlist.books.all():
+        wishlist.books.remove(product)
+
+    return redirect('wishlist')
+
+
+
+
+
+
+
+    
+    

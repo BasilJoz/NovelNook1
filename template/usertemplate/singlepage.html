@@ -28,7 +28,9 @@
                   </div>
                 {% endfor %}
                 <div class="mt-3">
-                    <button type="button" class="btn save-to-wishlist">SAVE TO WISHLIST</button>
+                    <a href="{% url 'add_to_wishlist' book_id=products.id %}">
+                        <button type="button" class="btn save-to-wishlist">SAVE TO WISHLIST</button>
+                    </a>
                 </div>
                 <div class="mt-5">
                     <div class="card text-start mt-5 mb-5 product-description-card">

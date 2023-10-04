@@ -20,7 +20,12 @@ urlpatterns = [
     path('hello', views.hello, name='hello'),
     path('payment/<int:address_id>', views.payment, name='payment'),
     path('razor/<int:address_id>/<str:final_total>', views.razor, name="razor"),
-    path('wishlist', views.wishlist, name="wishlist"),
+    path('wishlist/', views.wishlist, name='wishlist'),
+    path('wishlist/add/<int:book_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('remove_from_wishliste/<int:book_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+
+
+
 
     
 ]
