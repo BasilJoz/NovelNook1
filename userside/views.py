@@ -3,7 +3,7 @@ from .models import Cart, CartItems
 from admins.models import books, Coupon
 from logins.models import user_details
 from logins.models import Address
-from .models import Order, OrderItem,Wishlist
+from .models import Order, OrderItem,Wishlist,Wallet
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages
@@ -511,13 +511,29 @@ def my_orders(request):
     return render(request, "usertemplate/my_orders.html", {"order_items": order_items})
 
 
+
 def cancel_order(request, order_id, product_id):
+    user = request.user
+    print(user)
     order = get_object_or_404(Order, id=order_id)
     order_item = OrderItem.objects.filter(order=order, product_id=product_id).first()
+    print(order_item,'first')
 
     if order_item:
-        order_item.order_status = "Cancelled"
-        order_item.save()
+        if order_item.order_status != "Cancelled":
+            # Check if the payment method used is 'Razorpay'
+            if order.payment_method == 'Razor Pay':
+                print('ugfkhjfkjfkjfkjfjfkukjfjjf12345')
+                refund_amount = order_item.product.price
+                print(refund_amount,'sdkjfhlkashklhkl')
+                # Get or create the user's wallet
+                user_wallet, created = Wallet.objects.get_or_create(user=user)
+                # Adjust the wallet balance by adding the refund amount
+                user_wallet.wallet_balance += refund_amount
+                user_wallet.save()
+
+            order_item.order_status = "Cancelled"
+            order_item.save()
 
     return redirect("my_orders")
 
@@ -620,6 +636,18 @@ def remove_from_wishlist(request, book_id):
 
     return redirect('wishlist')
 
+def wallet(request):
+    user = request.user
+    
+    try:
+        wallet = Wallet.objects.get(user=user)
+    except Wallet.DoesNotExist:
+        wallet = Wallet.objects.create(user=user, wallet_balance=0)
+        
+    refund_amount = wallet.wallet_balance
+    print(refund_amount,'shopper')
+    
+    return render(request, 'usertemplate/wallet.html', {'refund_amount': refund_amount})
 
 
 

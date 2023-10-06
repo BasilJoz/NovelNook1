@@ -59,3 +59,6 @@ class Wishlist(models.Model):
     def __str__(self):
         return f'Wishlist of {self.user.username}'
    
+class Wallet(models.Model):
+    user = models.ForeignKey(user_details,on_delete=models.CASCADE)
+    wallet_balance = models.IntegerField(default=0)
