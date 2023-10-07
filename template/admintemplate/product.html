@@ -40,11 +40,11 @@
                         <td>{{ books.discount_percent }}%</td>
                         <td>{{ books.active }}</td>
                         <td>
-                            <a href="{% url 'edit_products' books.id %}" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="{% url 'edit_products' books.id %}" class="btn btn-primary btn-sm mb-3"><i class="bi bi-pencil-square"></i></a>
                             {% if books.deleted == True%}
                             <a href="{% url 'undelete_products' books.id %}" class="btn btn-success btn-sm">Undo</a>
                             {% else %}
-                            <a href="{% url 'delete_products' books.id %}" class="btn btn-danger btn-sm">Soft Delete</a>
+                            <a href="{% url 'delete_products' books.id %}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
                             {% endif%}
                         </td>
                     </tr>

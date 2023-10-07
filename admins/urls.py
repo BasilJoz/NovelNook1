@@ -4,7 +4,7 @@ from admins import views
 urlpatterns = [
     # path('admin',views.handleadmin,name='admin'),
     path('signin',views.hanglesignin,name='signin'),
-    path('index',views.hangleindex,name='index'),
+    path('index',views.handleindex,name='index'),
     path('users',views.handleuser,name='users'),
     path('block_user/<int:id>/',views.handleblock,name='block_user'),
     path('unblock_user/<int:id>',views.handleunblock,name='unblock_user'),

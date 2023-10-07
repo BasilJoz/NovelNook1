@@ -50,6 +50,45 @@
         </div>
     </div>
 </div>
+
+<div class="reviews">
+
+    <!-- Display reviews -->
+    <h2>Reviews</h2>
+    <ul>
+        {% for review in reviews %}
+            <li>
+                <strong>{{ review.user.username }}</strong>
+                <p>Rating: {{ review.rating }}</p>
+                <p>{{ review.comment }}</p>
+                <p>Posted on: {{ review.created_at }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Review form -->
+    {% if can_write_review %}
+        <h2>Write a Review</h2>
+        <form method="post" action="{% url 'add_review' book.id %}">
+            {% csrf_token %}
+            <label for="rating">Rating:</label>
+            <select name="rating" id="rating" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <br>
+            <label for="comment">Comment:</label>
+            <textarea name="comment" id="comment" rows="4" cols="50"></textarea>
+            <br>
+            <button type="submit">Submit Review</button>
+        </form>
+
+    {% endif %}
+
+  </div>
 <style>/* Add this CSS to your project's stylesheet */
     .product-image {
         background-size: cover;
@@ -105,5 +144,77 @@
     #variantImage{
         cursor: pointer;
     }
+
+        /* Style the Reviews section */
+        .reviews {
+            margin-top: 40px;
+        }
+    
+        .reviews h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+    
+        .reviews ul {
+            list-style: none;
+            padding: 0;
+        }
+    
+        .reviews li {
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .reviews strong {
+            font-size: 18px;
+            color: #333;
+        }
+    
+        .reviews p {
+            margin: 10px 0;
+            color: #666;
+        }
+    
+        .reviews .review-form {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .reviews label {
+            font-size: 16px;
+            color: #333;
+        }
+    
+        .reviews select,
+        .reviews textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    
+        .reviews button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    
+        /* Style the submit button */
+        .reviews button:hover {
+            background-color: #555;
+        }
     </style>
 {% endblock body %}

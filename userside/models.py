@@ -62,3 +62,13 @@ class Wishlist(models.Model):
 class Wallet(models.Model):
     user = models.ForeignKey(user_details,on_delete=models.CASCADE)
     wallet_balance = models.IntegerField(default=0)
+    
+class Review(models.Model):
+    book = models.ForeignKey(books, on_delete=models.CASCADE)
+    user = models.ForeignKey(user_details, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField(choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def _str_(self):
+        return f"Review for {self.order_item.book.title} by {self.user.username}"

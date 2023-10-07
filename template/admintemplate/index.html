@@ -1,5 +1,277 @@
 {% extends 'baseadmin.html' %}
-{% block title %}Admin DashBoard{% endblock title %}
+
 {% block body %}
-<h1>ahdk</h1>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+<!-- Page content -->
+<style>
+
+    /* Icon Styling */
+    .fa-3x {
+        font-size: 3em;
+    }
+
+    /* Chart Title Styling */
+    .mb-4 {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    /* Chart Canvas Styling */
+    canvas {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Table Styling */
+    .table {
+        background-color: #fff;
+        border: 1px solid #ccc;
+    }
+
+    .table th,
+    .table td {
+        border: 1px solid #ccc;
+        padding: 12px;
+        text-align: center;
+    }
+
+    /* Button Styling */
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    /* Show All Link Styling */
+    a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+<!-- Sale & Revenue Start -->
+<div class="container-fluid pt-4" style="margin-top: 100px;">
+    <div class="row">
+        <!-- Today Sale Card -->
+        <div class="col-xl-3 col-sm-6 ">
+            <div class="text-center p-4" style="background-color: #15ccf10f;box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);border: 1px solid #e0dcdc;">
+                <i class="fa fa-chart-line fa-3x text-primary"></i>
+                <p class="mb-2">Today Sale</p>
+                <h5 class="mb-0">₹{{ todaySalesData }}</h5>
+            </div>
+        </div>
+        <!-- Today Revenue Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="text-center p-4" style="background-color: #15ccf10f;box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);border: 1px solid #e0dcdc;">
+                <i class="fa fa-chart-area fa-3x text-primary"></i>
+                <p class="mb-2">Today Revenue</p>
+                <h4 class="mb-0">₹{{ todayRevenueData }}</h4>
+            </div>
+        </div>
+        <!-- Total Sale Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="text-center p-4" style="background-color: #15ccf10f;box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);border: 1px solid #e0dcdc;">
+                <i class="fa fa-chart-bar fa-3x text-primary"></i>
+                <p class="mb-2">Total Sale</p>
+                <h4 class="mb-0">₹{{ totalSalesData }}</h4>
+            </div>
+        </div>
+        <!-- Total Revenue Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="text-center p-4" style="background-color: #15ccf10f;box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);border: 1px solid #e0dcdc;">
+                <i class="fa fa-chart-pie fa-3x text-primary"></i>
+                <p class="mb-2">Total Revenue</p>
+                <h4 class="mb-0">₹{{ totalRevenueData }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sale & Revenue End -->
+
+<!-- Sales Chart Start -->
+<div class="container-fluid pt-4">
+    <div class="row">
+        <!-- Worldwide Sales Chart -->
+        <div class="col-xl-6">
+            <div class="text-center p-4" style="background-color: #15ccf10f;box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);border: 1px solid #e0dcdc;">
+                <h3 class="mb-4">Sales</h3>
+                <canvas id="salesChartCanvas" width="400" height="200"></canvas>
+            </div>
+        </div>
+        <!-- Salse & Revenue Chart -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="text-center p-4" style="background-color: #15ccf10f;box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);border: 1px solid #e0dcdc;">
+                <h3 class="mb-4">Revenue</h3>
+                <canvas id="revenueChartCanvas" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sales Chart End -->
+
+<!-- Recent Sales Start -->
+<div class="container-fluid pt-4">
+    <div class="text-center p-4" style="background-color: #15ccf10f;box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);border: 1px solid #e0dcdc;">
+        <h3 class="mb-4">Recent Transactions</h3>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr class="text-dark">
+                        <th scope="col" class="text-center" style="width: 50px;">ID</th>
+                        <th scope="col" class="text-center" style="width: 150px;">Customer</th>
+                        <th scope="col" class="text-center" style="width: 100px;">Date</th>
+                        <th scope="col" class="text-center" style="width: 80px;">Amount</th>
+                        <th scope="col" class="text-center" style="width: 120px;">Payment</th>
+                        <th scope="col" class="text-center" style="width: 120px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td class="text-center">{{ order.id }}</td>
+                        <td class="text-center">{{ order.user }}</td>
+                        <td class="text-center">{{ order.order_date }}</td>
+                        <td class="text-center">{{ order.total_price }}</td>
+                        <td class="text-center">{{ order.payment_method }}</td>
+                        <td class="text-center">{{ order.order_status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Recent Sales End -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var todaySalesData = {{ todaySalesData|default:0 }};
+    var todayRevenueData = {{ todayRevenueData|default:0 }};
+    var totalSalesData = {{ totalSalesData|default:0 }};
+    var totalRevenueData = {{ totalRevenueData|default:0 }};
+
+    var salesChartCanvas = document.getElementById('salesChartCanvas').getContext('2d');
+    var revenueChartCanvas = document.getElementById('revenueChartCanvas').getContext('2d');
+
+    // Sales Chart
+    var salesChart = new Chart(salesChartCanvas, {
+        type: 'bar',
+        data: {
+            labels: ['Today Sales', 'Total Sales'],
+            datasets: [{
+                label: 'Sales',
+                data: [todaySalesData, totalSalesData],
+                backgroundColor: [
+                    'rgba(63, 81, 181, 0.7)',
+                    'rgba(33, 150, 243, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(63, 81, 181, 1)',
+                    'rgba(33, 150, 243, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Sales Overview',
+                    font: {
+                        weight: 'bold',
+                        size: 16
+                    }
+                }
+            }
+        }
+    });
+
+    // Revenue Chart
+    var revenueChart = new Chart(revenueChartCanvas, {
+        type: 'bar',
+        data: {
+            labels: ['Today Revenue', 'Total Revenue'],
+            datasets: [{
+                label: 'Revenue',
+                data: [todayRevenueData, totalRevenueData],
+                backgroundColor: [
+                    'rgba(139, 195, 74, 0.7)',
+                    'rgba(255, 87, 34, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(139, 195, 74, 1)',
+                    'rgba(255, 87, 34, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Revenue Overview',
+                    font: {
+                        weight: 'bold',
+                        size: 16
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+
+
 {% endblock body %}

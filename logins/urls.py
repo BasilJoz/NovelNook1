@@ -9,5 +9,6 @@ urlpatterns = [
     path('Logout', views.Logout,name='Logout'),
     path('handleshop/', views.handleshop,name='handleshop'),
     path('hanldesingleproduct/<int:product_id>', views.hanldesingleproduct,name='hanldesingleproduct'),
+    path('add_review/<int:order_item_id>', views.add_review,name='add_review'),
     
 ]

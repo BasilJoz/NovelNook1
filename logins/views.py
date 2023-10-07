@@ -6,6 +6,7 @@ from . import verify
 from admins.models import books, Category
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
+from userside.models import Review,OrderItem,Order,books
 
 
 # Create your views here.
@@ -148,5 +149,48 @@ def Logout(request):
 
 def hanldesingleproduct(request, product_id):
     product = books.objects.get(id=product_id)
+    can_write_review = False  # Initialize the flag as False
 
-    return render(request, "usertemplate/singlepage.html", {"products": product})
+    # Check if the user is logged in
+    if request.user.is_authenticated:
+        # Check if the user has ordered this book and it's been delivered
+        ordered_book = OrderItem.objects.filter(
+            order__user=request.user,
+            product=product,
+            order_status = 'Delivered'
+        )
+
+        if ordered_book:
+            can_write_review = True  # Set the flag to True
+
+    # Query the reviews associated with the book
+    reviews = Review.objects.filter(book=product)
+
+    context = {
+        'book': product,
+        'can_write_review': can_write_review,
+        'reviews': reviews,  # Pass the reviews to the template
+        'products': product
+        
+    }
+
+    return render(request, 'usertemplate/singlepage.html', context)
+    
+
+    
+
+
+
+def add_review(request, order_item_id):
+    if request.method == 'POST':
+        book = get_object_or_404(books, id=order_item_id)
+        user = request.user
+        rating = request.POST['rating']
+        comment = request.POST['comment']
+
+        # Check if the user has ordered and received this book
+
+    Review.objects.create(book=book, user=user, rating=rating, comment=comment)
+
+            # Redirect back to the book detail page or another appropriate page
+    return redirect('hanldesingleproduct', product_id=order_item_id)

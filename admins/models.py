@@ -52,3 +52,5 @@ class Coupon(models.Model):
         now = timezone.now().date()
         return self.valid_from <= now <= self.valid_to
     
+
+    

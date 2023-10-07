@@ -3,7 +3,7 @@ from .models import Cart, CartItems
 from admins.models import books, Coupon
 from logins.models import user_details
 from logins.models import Address
-from .models import Order, OrderItem,Wishlist,Wallet
+from .models import Order, OrderItem,Wishlist,Wallet,Review
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages
@@ -648,6 +648,8 @@ def wallet(request):
     print(refund_amount,'shopper')
     
     return render(request, 'usertemplate/wallet.html', {'refund_amount': refund_amount})
+
+
 
 
 

@@ -1,17 +1,15 @@
-from django.shortcuts import render,redirect,HttpResponse ,get_object_or_404
+from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from logins.models import user_details
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.contrib import messages
-from .models import Category,books,Coupon
+from .models import Category, books, Coupon
 from django.views.decorators.cache import never_cache
-from userside.models import Order,OrderItem
+from userside.models import Order, OrderItem
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from decimal import Decimal
-
-
-
+from django.db.models import Sum, F
 
 
 # Create your views here.
@@ -19,68 +17,112 @@ from decimal import Decimal
 #     return render(request ,'baseadmin.html')
 @never_cache
 def hanglesignin(request):
-    
-    if request.method == 'POST':
-        username=request.POST['email']
+    if request.method == "POST":
+        username = request.POST["email"]
         print(username)
-        password =request.POST['password']
+        password = request.POST["password"]
         try:
             user = user_details.objects.get(username=username)
             print(user)
             password_matched = user.check_password(password)
         except:
             print("dddd")
-            return redirect('signin')
+            return redirect("signin")
         if user and password_matched and user.is_superuser:
-            auth.login(request,user)
-            return redirect('index')
+            auth.login(request, user)
+            return redirect("index")
         else:
-            messages.warning(request,'Not a superuser')
-            return redirect('signin')
-       
-    if  not request.user.is_authenticated:
-       return render(request,"admintemplate/signin.html")
+            messages.warning(request, "Not a superuser")
+            return redirect("signin")
+
+    if not request.user.is_authenticated:
+        return render(request, "admintemplate/signin.html")
     else:
-    
-        return render(request,"admintemplate/signin.html")
-    
-    
+        return render(request, "admintemplate/signin.html")
+
+
 @never_cache
-@login_required(login_url='signin')
-def hangleindex(request):
-    # Ensure that the user is a superuser
+@login_required(login_url="signin")
+def handleindex(request):
+    name = request.user
     if not request.user.is_superuser:
-        auth.logout(request)  # Logout non-superusers
-        return redirect('signin')
+        auth.logout(request)
+        return redirect("signin")
 
-    # Fetch the superuser's details
-    obj = user_details.objects.get(is_superuser=True)
+    today_start = timezone.make_aware(
+        timezone.datetime.combine(timezone.now().date(), timezone.datetime.min.time())
+    )
+    today_end = timezone.make_aware(
+        timezone.datetime.combine(timezone.now().date(), timezone.datetime.max.time())
+    )
 
-    return render(request, "admintemplate/index.html", {'name': obj})
+    today_sales = OrderItem.objects.filter(
+        order__order_date__range=(today_start, today_end),  # Modify this line
+        order__user__is_superuser=False,
+        order_status="Delivered",
+    ).aggregate(today_sales=Sum("order__total_price"))["today_sales"] or Decimal(0)
+
+    today_revenue = OrderItem.objects.filter(
+        order__order_date__range=(today_start, today_end),
+        order__user__is_superuser=False,
+        order_status="Delivered",
+    ).aggregate(today_revenue=Sum("order__total_price"))["today_revenue"] or Decimal(0)
+
+    total_sales = OrderItem.objects.filter(order_status="Delivered").annotate(
+        total_price_sum=Sum("order__total_price")
+    ).aggregate(total_sales=Sum(F("total_price_sum")))["total_sales"] or Decimal(0)
+
+    total_revenue = OrderItem.objects.filter(order_status="Delivered").annotate(
+        total_price_tax_sum=Sum("order__total_price")
+    ).aggregate(total_revenue=Sum(F("total_price_tax_sum")))[
+        "total_revenue"
+    ] or Decimal(
+        0
+    )
+
+    orders = OrderItem.objects.filter(order_status="Delivered").order_by("-id")
+
+    return render(
+        request,
+        "admintemplate/index.html",
+        {
+            "todaySalesData": today_sales,
+            "todayRevenueData": today_revenue,
+            "totalSalesData": total_sales,
+            "totalRevenueData": total_revenue,
+            "orders": orders,
+            "name": name,
+        },
+    )
+
 
 def handleuser(request):
-    obj=user_details.objects.exclude(is_superuser = True)
-    return render(request,'admintemplate/users.html',{'adm_user':obj})
+    obj = user_details.objects.exclude(is_superuser=True)
+    return render(request, "admintemplate/users.html", {"adm_user": obj})
 
-def handleblock(request,id):
+
+def handleblock(request, id):
     adm_user = user_details.objects.get(id=id)
-    adm_user.is_active =False
+    adm_user.is_active = False
     adm_user.save()
-    return redirect('users')
+    return redirect("users")
 
-def handleunblock(request,id):
+
+def handleunblock(request, id):
     adm_user = user_details.objects.get(id=id)
     adm_user.is_active = True
     adm_user.save()
-    return redirect('users')
+    return redirect("users")
+
 
 def handlecategory(request):
-    adm_category = Category.objects.all().order_by('id')
-    return render(request,'admintemplate/category.html',{'categories':adm_category})
+    adm_category = Category.objects.all().order_by("id")
+    return render(request, "admintemplate/category.html", {"categories": adm_category})
+
 
 def add_category(request):
-    if request.method == 'POST':
-        cat_name = request.POST['category_name']
+    if request.method == "POST":
+        cat_name = request.POST["category_name"]
         if cat_name:
             existing_category = Category.objects.filter(name=cat_name).exists()
             if existing_category:
@@ -88,54 +130,56 @@ def add_category(request):
             else:
                 category = Category(name=cat_name)
                 category.save()
-                return redirect('category')
-    return render(request,'admintemplate/addcategory.html')
+                return redirect("category")
+    return render(request, "admintemplate/addcategory.html")
 
-def edit_category(request,id):
 
-    cat_obj = Category.objects.get(id=id) 
-    if request.method == 'POST':
-        edit_name = request.POST.get('edited_name')
+def edit_category(request, id):
+    cat_obj = Category.objects.get(id=id)
+    if request.method == "POST":
+        edit_name = request.POST.get("edited_name")
         if edit_name is not None:
             try:
                 existing_category = Category.objects.get(name=edit_name)
                 if existing_category.id != id:
                     messages.info(request, "Category with this name already exists.")
-                    return redirect('edit_category/' + str(id))
+                    return redirect("edit_category/" + str(id))
 
                 cat_obj.name = edit_name
                 cat_obj.save()
-                return redirect('category')
+                return redirect("category")
             except Category.DoesNotExist:
                 cat_obj.name = edit_name
                 cat_obj.save()
-                return redirect('category')
-    return render(request, 'admintemplate/editcategory.html', {'cat': cat_obj})
+                return redirect("category")
+    return render(request, "admintemplate/editcategory.html", {"cat": cat_obj})
 
-def delete_category(request,id):
-    cat_obj = Category.objects.get( id=id)
+
+def delete_category(request, id):
+    cat_obj = Category.objects.get(id=id)
     cat_obj.delete()
-    return redirect('category')
+    return redirect("category")
+
 
 def products(request):
     active_books = books.objects.all()
-    
-    return render(request,'admintemplate/product.html',{'books_items':active_books})
+
+    return render(request, "admintemplate/product.html", {"books_items": active_books})
+
 
 def add_products(request):
-    
     if request.method == "POST":
-        title = request.POST.get('book_title')
-        category_name= request.POST.get('book_categories')
-        author = request.POST.get('book_author')
-        active = request.POST.get('book_active')
-        handleactive = True if active == 'active' else False
-        price = request.POST.get('book_price')
-        offer_price = request.POST.get('book_offer_price')
-        quantity = request.POST.get('book_quantity')
-        discount_percent = request.POST.get('book_discount')
-        image = request.FILES.get('book_image')
-        discription =request.POST.get('prod_description')
+        title = request.POST.get("book_title")
+        category_name = request.POST.get("book_categories")
+        author = request.POST.get("book_author")
+        active = request.POST.get("book_active")
+        handleactive = True if active == "active" else False
+        price = request.POST.get("book_price")
+        offer_price = request.POST.get("book_offer_price")
+        quantity = request.POST.get("book_quantity")
+        discount_percent = request.POST.get("book_discount")
+        image = request.FILES.get("book_image")
+        discription = request.POST.get("prod_description")
         try:
             category = Category.objects.get(name=category_name)
 
@@ -152,30 +196,33 @@ def add_products(request):
                 discription=discription,
             )
             new_product.save()
-            return redirect('products')
+            return redirect("products")
         except Category.DoesNotExist:
-            messages.ERROR(request,"invalid cateroy")
-            return redirect('add_products')
+            messages.ERROR(request, "invalid cateroy")
+            return redirect("add_products")
     else:
         all_categories = Category.objects.all()
-        return render(request,'admintemplate/addproduct.html',{'categories':all_categories})
-    
-def edit_products(request,book_id):
+        return render(
+            request, "admintemplate/addproduct.html", {"categories": all_categories}
+        )
+
+
+def edit_products(request, book_id):
     edit_books = books.objects.get(id=book_id, deleted=False)
-     
+
     if request.method == "POST":
-        title = request.POST.get('edit_title')
-        category_name= request.POST.get('edit_categories')
-        author = request.POST.get('edit_author')
-        active = request.POST.get('edit_active')
-        handleactive = True if active == 'active' else False
-        price = request.POST.get('edit_price')
-        offer_price = request.POST.get('edit_offer_price')
-        quantity = request.POST.get('edit_quantity')
-        discount_percent = request.POST.get('edit_discount')
-        image = request.FILES.get('edit_image')
-        discription = request.POST.get('edit_prod_description')
-        
+        title = request.POST.get("edit_title")
+        category_name = request.POST.get("edit_categories")
+        author = request.POST.get("edit_author")
+        active = request.POST.get("edit_active")
+        handleactive = True if active == "active" else False
+        price = request.POST.get("edit_price")
+        offer_price = request.POST.get("edit_offer_price")
+        quantity = request.POST.get("edit_quantity")
+        discount_percent = request.POST.get("edit_discount")
+        image = request.FILES.get("edit_image")
+        discription = request.POST.get("edit_prod_description")
+
         category = Category.objects.get(name=category_name)
         edit_books.title = title
         edit_books.categories = category
@@ -188,48 +235,55 @@ def edit_products(request,book_id):
         edit_books.image = image
         edit_books.discription = discription
         edit_books.save()
-        return redirect('products')
-    
-    cat=Category.objects.all()
+        return redirect("products")
+
+    cat = Category.objects.all()
     print(edit_books.discription)
-    return render(request, 'admintemplate/editproduct.html', {'edit_book': edit_books, 'categories': cat})
-def delete_products(request,book_id):
+    return render(
+        request,
+        "admintemplate/editproduct.html",
+        {"edit_book": edit_books, "categories": cat},
+    )
+
+
+def delete_products(request, book_id):
     delete_pro = books.objects.get(id=book_id)
     delete_pro.soft_delete()
-    return redirect('products')
+    return redirect("products")
 
-def undelete_products(request,book_id):
+
+def undelete_products(request, book_id):
     delete_pro = books.objects.get(id=book_id)
     delete_pro.undelete()
-    return redirect('products')
+    return redirect("products")
+
 
 def handlelogout(request):
     auth.logout(request)
-    return redirect('signin')
+    return redirect("signin")
 
 
-    
 def userorders(request):
-    
     if not request.user.is_authenticated or not request.user.is_superuser:
-        return redirect('signin')
+        return redirect("signin")
 
     users = user_details.objects.filter(is_superuser=False)
-    orders = Order.objects.filter(user__in=users).order_by('-id')
+    orders = Order.objects.filter(user__in=users).order_by("-id")
 
-    return render(request, 'admintemplate/userorders.html', {"orders": orders})
+    return render(request, "admintemplate/userorders.html", {"orders": orders})
 
 
-def userorderitems(request,id):
-   
+def userorderitems(request, id):
     if not request.user.is_authenticated or not request.user.is_superuser:
-        return redirect('signin')
+        return redirect("signin")
 
     order_items = OrderItem.objects.filter(order_id=id).order_by("id")
 
-    return render(request, "admintemplate/userorderitems.html", {"order_items": order_items})
+    return render(
+        request, "admintemplate/userorderitems.html", {"order_items": order_items}
+    )
 
-    
+
 def orderstatus(request, id):
     if not request.user.is_authenticated or not request.user.is_superuser:
         return redirect("'signin'")
@@ -241,13 +295,16 @@ def orderstatus(request, id):
         if order_status:
             order_items.order_status = order_status
             order_items.save()
-            return redirect('userorders')
+            return redirect("userorders")
 
-    return render(request, "admintemplate/orderstatus.html", {"order_items": order_items})
+    return render(
+        request, "admintemplate/orderstatus.html", {"order_items": order_items}
+    )
+
 
 def coupons(request):
     if not request.user.is_authenticated or not request.user.is_superuser:
-        return redirect('signin')
+        return redirect("signin")
 
     coupons = Coupon.objects.all()
 
@@ -283,9 +340,10 @@ def add_coupons(request):
             is_expired=is_expired,  # Set the correct is_expired value
         )
 
-        return redirect('coupons')
+        return redirect("coupons")
 
     return render(request, "admintemplate/add_coupon.html")
+
 
 def edit_coupons(request, id):
     coupon = get_object_or_404(Coupon, id=id)
@@ -327,7 +385,3 @@ def delete_coupons(request, id):
 
     coupon.delete()
     return redirect("coupons")
-    
-
-
-    
