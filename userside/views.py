@@ -181,7 +181,7 @@ def userprofile(request):
         },
     )
 
-
+@login_required(login_url="login")
 def useraddress(request):
     if not request.user.is_authenticated:
         return redirect("login")
@@ -275,7 +275,7 @@ def delete_address(request, del_id):
     address.delete()
     return redirect("useraddress")
 
-
+@login_required(login_url="login")
 def checkout(request):
     if not request.user.is_authenticated:
         return redirect("user_login")
@@ -547,6 +547,18 @@ def get_cart_item_count(request):
         item_count = 0
 
     return JsonResponse({"item_count": item_count})
+
+
+def get_wishlist_item_count(request):
+    if request.user.is_authenticated:
+        user = request.user
+        wishlist, created = Wishlist.objects.get_or_create(user=user)
+        item_count = wishlist.books.count()  # Count the number of books in the user's wishlist
+    else:
+        item_count = 0
+
+    return JsonResponse({"item_count": item_count})
+
 
 
 def coupons_details(request):

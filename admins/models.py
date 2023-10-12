@@ -4,10 +4,19 @@ from django.utils import timezone
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    
+    is_deleted = models.BooleanField(default=False)  # Add this field
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
+
+    def undelete(self):
+        self.is_deleted = False
+        self.save()
 
     def __str__(self):
         return self.name
+    
     
 class books(models.Model):
     title = models.CharField(max_length=200)

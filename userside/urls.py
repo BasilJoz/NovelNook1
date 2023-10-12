@@ -15,6 +15,7 @@ urlpatterns = [
     path('cancel_order/<int:order_id>/<int:product_id>', views.cancel_order, name='cancel_order'),
     path('update_cart_item_quantity', views.update_cart_item_quantity, name='update_cart_item_quantity'),
     path('get_cart_item_count', views.get_cart_item_count, name='get_cart_item_count'),
+    path('get_wishlist_item_count', views.get_wishlist_item_count, name='get_wishlist_item_count'),
     path('coupons_details', views.coupons_details, name='coupons_details'),
     path('remove_coupon', views.remove_coupon, name='remove_coupon'),
     path('hello', views.hello, name='hello'),

@@ -7,21 +7,26 @@ from admins.models import books, Category
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from userside.models import Review,OrderItem,Order,books
+from django.views.decorators.cache import never_cache 
 
 
 # Create your views here.
+@never_cache
 def home(request):
     print(request.user, "newone")
     if request.user.is_anonymous:
+        
         return redirect('login')
     elif request.user.is_superuser:
         auth.logout(request)
         return redirect('login')
     else:
         
-        book = books.objects.filter(deleted=False)[:4]
+        categories = Category.objects.filter(is_deleted=False)
+        
+        book = books.objects.filter(deleted=False, categories__is_deleted=False)[:4]
 
-        return render(request, "usertemplate/home.html", {"best_seller": book})
+        return render(request, "usertemplate/home.html", {"best_seller": book, "categories": categories})
 
 
 def handlelogin(request):
@@ -103,7 +108,7 @@ def Otp(request, phone, id):
 
 def handleshop(request):
     # Retrieve all categories
-    all_categories = Category.objects.all()
+    all_categories = Category.objects.filter(is_deleted=False)
 
     # Retrieve the selected category name from the request's GET parameters
     selected_category_name = request.GET.get("Category")
@@ -112,7 +117,7 @@ def handleshop(request):
     query = request.GET.get("q")
 
     # Initialize a queryset to store the filtered books
-    filtered_books = books.objects.filter(deleted=False)
+    filtered_books = books.objects.filter(deleted=False,categories__is_deleted=False)
 
     # Check if a category was selected and if it exists
     if selected_category_name:

@@ -156,8 +156,13 @@ def edit_category(request, id):
 
 
 def delete_category(request, id):
-    cat_obj = Category.objects.get(id=id)
-    cat_obj.delete()
+    cat_obj = get_object_or_404(Category, id=id, is_deleted=False)
+    cat_obj.soft_delete()
+    return redirect("category")
+
+def undelete_category(request, id):
+    cat_obj = get_object_or_404(Category, id=id, is_deleted=True)
+    cat_obj.undelete()
     return redirect("category")
 
 

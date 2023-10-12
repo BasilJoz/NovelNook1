@@ -1,66 +1,71 @@
 {% extends 'baseuser.html' %}
 
-
 {% block title %}checkout{% endblock %}
 
 {% load static %}
 {% block body %}
 <div style="margin-top: 90px;">
-	<form method="post" action="{% url 'checkout' %}">
-		{% csrf_token %}
-		<div class="container mt-5">
-			<h3 class="mb-4" style="font-weight: bold; font-family: 'Helvetica Neue', sans-serif;">SELECT ADDRESS</h3>
-			<div class="row">
-				<div class="col">
-
-					<table class="table table-bordered table-hover">
-						<thead class="thead-dark">
-							<tr>
-								<th class="text-center">SELECT</th>
-								<th class="text-center">ID</th>
-								<th class="text-center">ADDRESS DETAILS</th>
-								<th class="text-center">ACTIONS</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for address in addresses %}
-							<tr>
-								<td>
-									<div class="form-check text-center">
-										<input type="radio" class="form-check-input" name="selected_address"
-											value="{{ address.id }}">
-									</div>
-								</td>
-								<td class="text-center">{{ address.id }}</td>
-								<td>
-									<p class="text-center"><strong>{{ address.name }}</strong></p>
-									<p class="text-center">{{ address.postoffice }}, {{ address.street }},
-										{{address.city}},{{ address.state }}, {{ address.country }},
-										{{address.pin_code}}</p>
-								</td>
-								<td class="text-center">
-									<div class="btn-group">
-										<a href="{% url 'edit_address' address.id %}?next={% url 'checkout' %}"
-											class="btn btn-sm btn-primary mr-1">Edit</a>
-										<a href=""
-											class="btn btn-sm btn-danger">Delete</a>
-									</div>
-								</td>
-							</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-				</div>
-			</div>
-			<div class="row mt-4">
-				<div class="col text-center" style="margin-bottom: 80px;">
-					<button type="submit" class="btn btn-primary">
-						<h4>Submit</h4>
-					</button>
-					</a>
-				</div>
-			</div>
-		</div>
-	</form>
+    <form method="post" action="{% url 'checkout' %}">
+        {% csrf_token %}
+        <div class="container mt-5">
+            <h3 class="mb-4" style="font-weight: bold; font-family: 'Helvetica Neue', sans-serif;">SELECT ADDRESS</h3>
+            <div class="row">
+                <div class="col">
+                    {% if not addresses %}
+					<div class="d-flex align-items-center flex-column" style="margin-bottom: 100px;">
+							<img src="{% static 'img/not-found.gif' %}" style="width: 400px;" alt="">
+					<h2 style="color: rgb(89, 89, 89);">No Address Found. <a href="/userside/add_address">Click here </a>to add a new Address</h2>
+					</div>
+                    {% else %}
+                    <table class="table table-bordered table-hover ">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th class="text-center">SELECT</th>
+                                <th class="text-center">ID</th>
+                                <th class="text-center">ADDRESS DETAILS</th>
+                                <th class="text-center">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for address in addresses %}
+                            <tr>
+                                <td>
+                                    <div class="form-check text-center">
+                                        <input type="radio" class="form-check-input" name="selected_address"
+                                            value="{{ address.id }}">
+                                    </div>
+                                </td>
+                                <td class="text-center">{{ address.id }}</td>
+                                <td>
+                                    <p class="text-center"><strong>{{ address.name }}</strong></p>
+                                    <p class="text-center">{{ address.postoffice }}, {{ address.street }},
+                                        {{address.city}},{{ address.state }}, {{ address.country }},
+                                        {{address.pin_code}}</p>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <a href="{% url 'edit_address' address.id %}?next={% url 'checkout' %}"
+                                            class="btn btn-sm btn-primary mr-1">Edit</a>
+                                        <a href=""
+                                            class="btn btn-sm btn-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+					<div class="row mt-4">
+						<div class="col text-center" style="margin-bottom: 80px;">
+							<button type="submit" class="btn btn-primary">
+								<h4>Submit</h4>
+							</button>
+						</div>
+					</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+        </div>
+    </form>
 </div>
 {% endblock %}
